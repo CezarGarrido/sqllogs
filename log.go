@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 )
-
+//Query:
+//https://groups.google.com/forum/#!topic/golang-nuts/zIwClvZFWIs
 func Query(query string, args ...interface{}) string {
 	var buffer bytes.Buffer
 	nArgs := len(args)
