@@ -11,7 +11,7 @@ Go package for parsing SQL queries.
 ### Installing
 
 ```
-   go get https://github.com/CezarGarrido/sqllogs
+   go get github.com/CezarGarrido/sqllogs
 
 ```
 ## Usage
