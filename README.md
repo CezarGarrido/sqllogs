@@ -49,7 +49,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	log, _ := Logs()
+	log, _ := sqllogs.Logs()
 	fmt.Println(log)
 
 }
