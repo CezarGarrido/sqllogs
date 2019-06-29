@@ -22,7 +22,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"testing"
 	"time"
 	_ "github.com/CezarGarrido/sqllogs"
 	_ "github.com/go-sql-driver/mysql"
