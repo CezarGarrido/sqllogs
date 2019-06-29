@@ -3,13 +3,15 @@ package sqllogs
 import (
 	"bytes"
 	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"strings"
 	"time"
 )
+
 //Query:
 //https://groups.google.com/forum/#!topic/golang-nuts/zIwClvZFWIs
-func Query(query string, args ...interface{}) string {
+func Parse(query string,args []driver.Value) string {
 	var buffer bytes.Buffer
 	nArgs := len(args)
 	for i, part := range strings.Split(query, "?") {

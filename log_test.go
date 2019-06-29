@@ -1,31 +1,33 @@
 package sqllogs
 
 import (
+	"database/sql"
 	"fmt"
 	"testing"
-	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func TestInsert(t *testing.T) {
-	birty := time.Now()
-	name := "teste"
-	age := 21
-	height := 1.71
-	result1 := Query("insert teste set name=?, age=?,birty=?,height=?", name, age, birty, height)
-	fmt.Printf("%+v\n", result1)
-}
+	dbSource := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?parseTime=true",
+		"root",
+		"",
+		"localhost",
+		"3306",
+		"financeiro",
+	)
 
-func TestSelect(t *testing.T) {
-	name := "teste"
-	result2 := Query("select * from teste where name=?", name)
-	fmt.Printf("%+v\n", result2)
-}
-func TestPointerInsert(t *testing.T) {
-	day:=time.Now()
-	birty := &day
-	name := "teste"
-	age := 21
-	height := 1.71
-	result1 := Query("insert teste set name=?, age=?,birty=?,height=?", name, age, birty, height)
-	fmt.Printf("%+v\n", result1)
+	db, err := sql.Open("sqllog:mysql", dbSource)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.Exec("Select * from receitas where esc_id=?", 43)
+	if err != nil {
+		panic(err)
+	}
+	log, _ := Logs()
+	fmt.Println(log)
+
 }
