@@ -1,6 +1,6 @@
 # sqllogs 
 
-Go package for parsing SQL queries.
+Go package for parsing SQL queries and Log Queries.
 
 ## Getting Started
 
