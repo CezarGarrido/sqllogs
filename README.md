@@ -53,7 +53,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	log := ExecLogs()
+	log := sqllogs.ExecLogs()
 	fmt.Println("All logs ->",log)
 	
 	//output:
