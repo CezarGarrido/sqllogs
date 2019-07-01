@@ -17,7 +17,7 @@ func TestInsert(t *testing.T) {
 		"3306",
 		"financeiro",
 	)
-
+	SetDebug(true)
 	db, err := sql.Open("sqllog:mysql", dbSource)
 	if err != nil {
 		panic(err)
@@ -27,7 +27,16 @@ func TestInsert(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	log, _ := Logs()
-	fmt.Println(log)
+	_, err = db.Exec("Select * from categorias where esc_id=?", 43)
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.Exec("Select * from despesas where esc_id=?", 43)
+	if err != nil {
+		panic(err)
+	}
+	log := ExecLogs()
+	fmt.Println("All logs ->",log)
 
+	fmt.Println("Fim.")
 }

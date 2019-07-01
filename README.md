@@ -16,15 +16,14 @@ Go package for parsing SQL queries.
 ```
 ## Usage
 
-```
+```go
 package main
 
 import (
 	"database/sql"
 	"fmt"
-	"testing"
 	"time"
-	_ "github.com/CezarGarrido/sqllogs"
+	"github.com/CezarGarrido/sqllogs"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -37,20 +36,31 @@ func main() {
 		"port",
 		"dbname",
 	)
+	sqllogs.SetDebug(true)
 	db, err := sql.Open("sqllog:mysql", dbSource)
 	if err != nil {
 		panic(err)
 	}
-	birty := time.Now()
-	name := "teste"
-	age := 21
-	height := 1.71
-	_, err = db.Exec("insert tests set name=?, age=?,birty=?,height=?", name, age, birty, height)
+	_, err = db.Exec("Select * from receitas where esc_id=?", 43)
 	if err != nil {
 		panic(err)
 	}
-	log, _ := Logs()
-	fmt.Println(log)
+	_, err = db.Exec("Select * from categorias where esc_id=?", 43)
+	if err != nil {
+		panic(err)
+	}
+	_, err = db.Exec("Select * from despesas where esc_id=?", 43)
+	if err != nil {
+		panic(err)
+	}
+	log := ExecLogs()
+	fmt.Println("All logs ->",log)
+	
+	//output:
+	//sqllog:Exec -> Select * from receitas where esc_id=43
+    //sqllog:Exec -> Select * from categorias where esc_id=43
+    //sqllog:Exec -> Select * from despesas where esc_id=43
+    //All logs -> [Select * from receitas where esc_id=43 Select * from categorias where esc_id=43 Select * from despesas where esc_id=43]
 
 }
 

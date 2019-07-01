@@ -9,9 +9,43 @@ import (
 	"time"
 )
 
+var (
+	ExecLog  = make(chan string)
+	QueryLog = make(chan string)
+	DEBUG    = false
+)
+
+func SetDebug(isDebug bool) {
+	DEBUG = isDebug
+}
+func ExecLogs() []string {
+	var logs []string
+	feito := make(chan bool, 1)
+	go func() {
+		for msg := range ExecLog {
+			logs = append(logs, msg)
+			feito <- true
+		}
+	}()
+	<-feito
+	return logs
+}
+func QueryLogs() []string {
+	var logs []string
+	feito := make(chan bool, 1)
+	go func() {
+		for msg := range QueryLog {
+			logs = append(logs, msg)
+			feito <- true
+		}
+	}()
+	<-feito
+	return logs
+}
+
 //Query:
 //https://groups.google.com/forum/#!topic/golang-nuts/zIwClvZFWIs
-func Parse(query string,args []driver.Value) string {
+func FormatSQL(query string, args []driver.Value) string {
 	var buffer bytes.Buffer
 	nArgs := len(args)
 	for i, part := range strings.Split(query, "?") {
@@ -49,27 +83,28 @@ func Parse(query string,args []driver.Value) string {
 			case *string:
 				val := args[i]
 				if val.(*string) != nil {
-					buffer.WriteString(fmt.Sprintf("%q", *val.(*string)))
+					buffer.WriteString(fmt.Sprintf("'%q'", *val.(*string)))
 				} else {
 					buffer.WriteString("NULL")
 				}
 			case *time.Time:
 				val := args[i]
 				if val.(*time.Time) != nil {
-					buffer.WriteString(fmt.Sprintf("%q", *val.(*time.Time)))
+					time := *val.(*time.Time)
+					//Format("2006-01-02 15:04:05")
+					buffer.WriteString(fmt.Sprintf("'%v'", time.Format("2006-01-02 15:04:05")))
 				} else {
 					buffer.WriteString("NULL")
 				}
-			case int64:
+			case int, int8, int16, int32, int64,
+				uint, uint8, uint16, uint32, uint64:
 				buffer.WriteString(fmt.Sprintf("%d", a))
 			case float64:
 				buffer.WriteString(fmt.Sprintf("%f", a))
-			case int:
-				buffer.WriteString(fmt.Sprintf("%d", a))
 			case bool:
 				buffer.WriteString(fmt.Sprintf("%t", a))
 			case time.Time:
-				buffer.WriteString(fmt.Sprintf("%q", a))
+				buffer.WriteString(fmt.Sprintf("'%v'", a.Format("2006-01-02 15:04:05")))
 			case sql.NullBool:
 				if a.Valid {
 					buffer.WriteString(fmt.Sprintf("%t", a.Bool))
@@ -93,7 +128,7 @@ func Parse(query string,args []driver.Value) string {
 				buffer.WriteString("NULL")
 			default:
 				//rv := reflect.ValueOf(a)
-				buffer.WriteString(fmt.Sprintf("%q", a))
+				buffer.WriteString(fmt.Sprintf("'%v'", a))
 			}
 		}
 	}

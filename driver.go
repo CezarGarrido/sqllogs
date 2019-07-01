@@ -3,23 +3,9 @@ package sqllogs
 import (
 	"database/sql"
 	"database/sql/driver"
-	"errors"
 
 	"github.com/go-sql-driver/mysql"
 )
-
-var (
-	LOGS = make(chan string)
-)
-
-func Logs() (string, error) {
-	select {
-	case msg := <-LOGS:
-		return msg, nil
-	default:
-		return "", errors.New("Failed log mysql")
-	}
-}
 
 type LoggingDriver struct {
 	Driver string

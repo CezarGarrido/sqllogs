@@ -2,7 +2,7 @@ package sqllogs
 
 import (
 	"database/sql/driver"
-	//"github.com/CezarGarrido/sqllogs"
+	"fmt"
 )
 
 type loggingStmt struct {
@@ -18,8 +18,11 @@ func (s *loggingStmt) Close() error {
 }
 func (s *loggingStmt) Exec(args []driver.Value) (driver.Result, error) {
 	go func() {
-		result := Parse(s.QueryValue, args)
-		LOGS <- result
+		q := FormatSQL(s.QueryValue, args)
+		if DEBUG {
+			fmt.Println("sqllog:Exec ->", q)
+		}
+		ExecLog <- q
 	}()
 	result, err := s.wrappedStmt.Exec(args)
 	if err != nil {
@@ -33,8 +36,11 @@ func (s *loggingStmt) NumInput() int {
 }
 func (s *loggingStmt) Query(args []driver.Value) (driver.Rows, error) {
 	go func() {
-		result := Parse(s.QueryValue, args)
-		LOGS <- result
+		q := FormatSQL(s.QueryValue, args)
+		if DEBUG {
+			fmt.Println("sqllog:Query ->", q)
+		}
+		QueryLog <- q
 	}()
 	rows, err := s.wrappedStmt.Query(args)
 	if err != nil {
