@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	ExecLog  = make(chan string)
-	QueryLog = make(chan string)
-	DEBUG    = false
+	LOGSEXEC  = []string{}
+	LOGSQUERY = []string{}
+	DEBUG     = false
 )
 
 func SetDebug(isDebug bool) {
@@ -20,29 +20,25 @@ func SetDebug(isDebug bool) {
 }
 func ExecLogs() []string {
 	var logs []string
-	feito := make(chan bool, 1)
-	go func() {
-		for msg := range ExecLog {
-			logs = append(logs, msg)
-			feito <- true
-		}
-	}()
-	<-feito
-	return logs
-}
-func QueryLogs() []string {
-	var logs []string
-	feito := make(chan bool, 1)
-	go func() {
-		for msg := range QueryLog {
-			logs = append(logs, msg)
-			feito <- true
-		}
-	}()
-	<-feito
+	logs = LOGSEXEC
+	LOGSEXEC = nil
 	return logs
 }
 
+func QueryLogs() []string {
+	var logs []string
+	logs = LOGSQUERY
+	LOGSQUERY = nil
+	return logs
+}
+
+func AddQueryLog(log string) {
+	LOGSQUERY = append(LOGSQUERY, log)
+}
+
+func AddExecLog(log string) {
+	LOGSEXEC = append(LOGSEXEC, log)
+}
 //Query:
 //https://groups.google.com/forum/#!topic/golang-nuts/zIwClvZFWIs
 func FormatSQL(query string, args []driver.Value) string {
@@ -91,7 +87,6 @@ func FormatSQL(query string, args []driver.Value) string {
 				val := args[i]
 				if val.(*time.Time) != nil {
 					time := *val.(*time.Time)
-					//Format("2006-01-02 15:04:05")
 					buffer.WriteString(fmt.Sprintf("'%v'", time.Format("2006-01-02 15:04:05")))
 				} else {
 					buffer.WriteString("NULL")
@@ -127,7 +122,6 @@ func FormatSQL(query string, args []driver.Value) string {
 			case nil:
 				buffer.WriteString("NULL")
 			default:
-				//rv := reflect.ValueOf(a)
 				buffer.WriteString(fmt.Sprintf("'%v'", a))
 			}
 		}

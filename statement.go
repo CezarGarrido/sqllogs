@@ -17,13 +17,13 @@ func (s *loggingStmt) Close() error {
 	return nil
 }
 func (s *loggingStmt) Exec(args []driver.Value) (driver.Result, error) {
-	go func() {
-		q := FormatSQL(s.QueryValue, args)
-		if DEBUG {
-			fmt.Println("sqllog:Exec ->", q)
-		}
-		ExecLog <- q
-	}()
+
+	q := FormatSQL(s.QueryValue, args)
+	if DEBUG {
+		fmt.Println("sqllog:Exec ->", q)
+	}
+	AddExecLog(q)
+
 	result, err := s.wrappedStmt.Exec(args)
 	if err != nil {
 		return nil, err
@@ -35,13 +35,11 @@ func (s *loggingStmt) NumInput() int {
 	return numInput
 }
 func (s *loggingStmt) Query(args []driver.Value) (driver.Rows, error) {
-	go func() {
-		q := FormatSQL(s.QueryValue, args)
-		if DEBUG {
-			fmt.Println("sqllog:Query ->", q)
-		}
-		QueryLog <- q
-	}()
+	q := FormatSQL(s.QueryValue, args)
+	if DEBUG {
+		fmt.Println("sqllog:Query ->", q)
+	}
+	AddQueryLog(q)
 	rows, err := s.wrappedStmt.Query(args)
 	if err != nil {
 		return nil, err

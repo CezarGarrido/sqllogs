@@ -37,6 +37,5 @@ func TestInsert(t *testing.T) {
 	}
 	log := ExecLogs()
 	fmt.Println("All logs ->",log)
-
 	fmt.Println("Fim.")
 }
