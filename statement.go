@@ -21,6 +21,7 @@ func (s *loggingStmt) Exec(args []driver.Value) (driver.Result, error) {
 	q := FormatSQL(s.QueryValue, args)
 	if DEBUG {
 		fmt.Println("sqllog:Exec ->", q)
+		fmt.Println()
 	}
 	AddExecLog(q)
 
@@ -38,6 +39,7 @@ func (s *loggingStmt) Query(args []driver.Value) (driver.Rows, error) {
 	q := FormatSQL(s.QueryValue, args)
 	if DEBUG {
 		fmt.Println("sqllog:Query ->", q)
+		fmt.Println()
 	}
 	AddQueryLog(q)
 	rows, err := s.wrappedStmt.Query(args)

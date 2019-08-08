@@ -36,6 +36,10 @@ func AddQueryLog(log string) {
 	LOGSQUERY = append(LOGSQUERY, log)
 }
 
+func ResetLogs(){
+	LOGSQUERY = nil
+}
+
 func AddExecLog(log string) {
 	LOGSEXEC = append(LOGSEXEC, log)
 }
